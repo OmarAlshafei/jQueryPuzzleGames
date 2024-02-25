@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jigsaw Puzzle</title>
+<style>
+    .puzzle-piece {
+        position: absolute;
+        cursor: pointer;
+    }
+</style>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+</head>
+<body>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Initialize puzzle pieces
+            const pieces = [];
+            for (let i = 1; i <= 9; i++) {
+                const piece = $(`<div class="puzzle-piece" id="piece${i}"><img src="p${i}.png" alt="Piece ${i}"></div>`);
+                piece.css({
+                    left: Math.floor(Math.random() * (window.innerWidth - 500)), // Random x-position inside the window
+                    top: Math.floor(Math.random() * (window.innerHeight - 500)) // Random y-position inside the window
+                });
+                pieces.push(piece);
+            }
+
+            // Add puzzle pieces to the body
+            for (let i = 0; i < pieces.length; i++) {
+                $('body').append(pieces[i]);
+            }
+
+            // Make puzzle pieces draggable
+            $('.puzzle-piece').draggable({
+                stack: '.puzzle-piece'
+            });
+        });
+    </script>
+</body>
+</html>

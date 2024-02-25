@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jigsaw Puzzle</title>
+<style>
+    /* Style for the puzzle pieces */
+    .puzzle-piece {
+        position: absolute;
+        cursor: pointer;
+    }
+
+    /* Style for the buttons */
+    button {
+        position: relative;
+        z-index: 1; /* Ensure buttons are above puzzle pieces */
+    }
+</style>
+</head>
+<body>
+    <div id="puzzle-container" style="position: relative;">
+        <!-- Puzzle pieces will be added here -->
+    </div>
+    <button id="up">Up</button>
+    <button id="down">Down</button>
+    <button id="left">Left</button>
+    <button id="right">Right</button>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Define puzzle piece dimensions
+            const pieceWidth = 300; // Adjusted width to fit the image
+            const pieceHeight = 200; // Adjusted height to fit the image
+
+            // Initialize puzzle pieces
+            const pieces = [];
+            for (let i = 1; i <= 9; i++) {
+                const piece = $(`<div class="puzzle-piece" id="piece${i}"><img src="p${i}.png" alt="Piece ${i}"></div>`);
+                pieces.push(piece);
+            }
+
+            // Randomly select a piece to be solved
+            const pieceToSolveIndex = Math.floor(Math.random() * pieces.length);
+            const pieceToSolve = pieces[pieceToSolveIndex];
+
+            // Calculate positions for each piece to form the complete image
+            const positions = [
+                { left: 317, top: 486 }, { left: 0, top: 522 }, { left: 317, top: 100 },
+                { left: 597, top: 100 }, { left: 598, top: 519 }, { left: 0, top: 277 },
+                { left: 281, top: 312 }, { left: 632, top: 276 }, { left: 0, top: 100 }
+            ];
+
+            // Add shuffled puzzle pieces to the container at calculated positions
+            for (let i = 0; i < pieces.length; i++) {
+                pieces[i].css(positions[i]);
+                $('#puzzle-container').append(pieces[i]);
+            }
+
+            // Set initial position for the piece to solve
+            pieceToSolve.css({
+                left: (window.innerWidth - pieceWidth) / 1.5,
+                top: (window.innerHeight - pieceHeight) / 2
+            });
+
+            // Button click handlers
+            $('#up').mousedown(() => startMovingPiece(pieceToSolve, 'up'));
+            $('#down').mousedown(() => startMovingPiece(pieceToSolve, 'down'));
+            $('#left').mousedown(() => startMovingPiece(pieceToSolve, 'left'));
+            $('#right').mousedown(() => startMovingPiece(pieceToSolve, 'right'));
+
+            // Stop moving the piece when the button is released
+            $(document).mouseup(() => stopMovingPiece());
+
+            // Variables to track the movement interval
+            let interval;
+
+            // Function to start moving the piece continuously
+            function startMovingPiece(piece, direction) {
+                interval = setInterval(() => movePiece(piece, direction), 10); // Faster movement
+            }
+
+            // Function to stop moving the piece
+            function stopMovingPiece() {
+                clearInterval(interval);
+            }
+
+            function movePiece(piece, direction) {
+                piece.css('z-index', 1000);
+
+                const currentLeft = parseInt(piece.css('left'));
+                const currentTop = parseInt(piece.css('top'));
+
+                switch (direction) {
+                    case 'up':
+                        piece.css({ top: currentTop - 1 });
+                        break;
+                    case 'down':
+                        piece.css({ top: currentTop + 1 });
+                        break;
+                    case 'left':
+                        piece.css({ left: currentLeft - 1 });
+                        break;
+                    case 'right':
+                        piece.css({ left: currentLeft + 1 });
+                        break;
+                }
+                piece.promise().done(function () {
+                    piece.css('z-index', 1);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
