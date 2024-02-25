@@ -12,20 +12,61 @@
     }
 
     /* Style for the buttons */
-    button {
-        position: relative;
-        z-index: 1; /* Ensure buttons are above puzzle pieces */
+    #controls {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
+
+    .arrow-buttons {
+        display: flex;
+        margin-bottom: 10px;
+    }
+
+    button {
+        width:60px;
+        height:20px;
+        font-size: 20px;
+        border: 2px solid black;
+        color: black;
+        border-radius: 10px;
+        cursor: pointer;
+        margin: 5px;
+        outline: none;
+        font-size: 10px;
+    }
+    
+    button:hover {
+        background-color: #999;
+    }
+    
+    button:active {
+        background-color: #555;
+    }
+    
 </style>
 </head>
 <body>
     <div id="puzzle-container" style="position: relative;">
         <!-- Puzzle pieces will be added here -->
     </div>
-    <button id="up">Up</button>
-    <button id="down">Down</button>
-    <button id="left">Left</button>
-    <button id="right">Right</button>
+    <div id="controls">
+        <div class="arrow-buttons">
+            <button id="up">Up</button>
+        </div>
+        <div class="arrow-buttons">
+            <button id="left">Left</button>
+            <button id="right">Right</button>
+        </div>
+        <div class="arrow-buttons">
+            <button id="down">Down</button>
+        </div>
+    </div>
+
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -76,9 +117,14 @@
             // Variables to track the movement interval
             let interval;
 
+            // Flag to check if puzzle is solved
+            let puzzleSolved = false;
+
             // Function to start moving the piece continuously
             function startMovingPiece(piece, direction) {
-                interval = setInterval(() => movePiece(piece, direction), 10); // Faster movement
+                if (!puzzleSolved) {
+                    interval = setInterval(() => movePiece(piece, direction), 10); // Faster movement
+                }
             }
 
             // Function to stop moving the piece
@@ -108,8 +154,32 @@
                 }
                 piece.promise().done(function () {
                     piece.css('z-index', 1);
+                    checkPuzzleComplete();
                 });
             }
+
+            function checkPuzzleComplete() {
+                let puzzleComplete = true;
+                const threshold = 2; // Adjust this threshold as needed
+            
+                pieces.forEach((piece, index) => {
+                    const currentLeft = parseInt(piece.css('left'));
+                    const currentTop = parseInt(piece.css('top'));
+                    const correctPosition = positions[index];
+                    if (Math.abs(currentLeft - correctPosition.left) > threshold || Math.abs(currentTop - correctPosition.top) > threshold) {
+                        puzzleComplete = false;
+                    }
+                });
+            
+                if (puzzleComplete) {
+                    // Stop moving the piece
+                    clearInterval(interval);
+                    alert('Congratulations! You solved the puzzle.');
+                    // Redirect to the same page to reset the puzzle
+                    window.location.reload();
+                }
+            }
+            
         });
     </script>
 </body>
