@@ -8,7 +8,9 @@
     .puzzle-piece {
         position: absolute;
         cursor: pointer;
+        pointer-events: none;
     }
+    
 
     #controls {
         position: fixed;
@@ -68,8 +70,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
-            const pieceWidth = 300;
-            const pieceHeight = 200;
+            const puzzlePieceWidth = 300;
+            const puzzlePieceHeight = 200;
 
             const pieces = [];
             for (let i = 1; i <= 9; i++) {
@@ -77,8 +79,8 @@
                 pieces.push(piece);
             }
 
-            const pieceToSolveIndex = Math.floor(Math.random() * pieces.length);
-            const pieceToSolve = pieces[pieceToSolveIndex];
+            const unsolvedPieceIdx = Math.floor(Math.random() * pieces.length);
+            const unsolvedPiece = pieces[unsolvedPieceIdx];
 
             const positions = [
                 { left: 317, top: 486 }, { left: 0, top: 522 }, { left: 317, top: 100 },
@@ -91,29 +93,29 @@
                 $('#puzzle-container').append(pieces[i]);
             }
 
-            pieceToSolve.css({
-                left: (window.innerWidth - pieceWidth) / 1.5,
-                top: (window.innerHeight - pieceHeight) / 2
+            unsolvedPiece.css({
+                left: (window.innerWidth - puzzlePieceWidth) / 1.5,
+                top: (window.innerHeight - puzzlePieceHeight) / 2
             });
 
-            $('#up').mousedown(() => startMovingPiece(pieceToSolve, 'up'));
-            $('#down').mousedown(() => startMovingPiece(pieceToSolve, 'down'));
-            $('#left').mousedown(() => startMovingPiece(pieceToSolve, 'left'));
-            $('#right').mousedown(() => startMovingPiece(pieceToSolve, 'right'));
+            $('#up').mousedown(() => startMoving(unsolvedPiece, 'up'));
+            $('#down').mousedown(() => startMoving(unsolvedPiece, 'down'));
+            $('#left').mousedown(() => startMoving(unsolvedPiece, 'left'));
+            $('#right').mousedown(() => startMoving(unsolvedPiece, 'right'));
 
-            $(document).mouseup(() => stopMovingPiece());
+            $(document).mouseup(() => stopMoving());
 
             let interval;
 
             let puzzleSolved = false;
 
-            function startMovingPiece(piece, direction) {
+            function startMoving(piece, direction) {
                 if (!puzzleSolved) {
-                    interval = setInterval(() => movePiece(piece, direction), 10); // Faster movement
+                    interval = setInterval(() => movePiece(piece, direction), 10);
                 }
             }
 
-            function stopMovingPiece() {
+            function stopMoving() {
                 clearInterval(interval);
             }
 
@@ -139,12 +141,12 @@
                 }
                 piece.promise().done(function () {
                     piece.css('z-index', 1);
-                    checkPuzzleComplete();
+                    puzzleCompletedCheck();
                 });
             }
 
-            function checkPuzzleComplete() {
-                let puzzleComplete = true;
+            function puzzleCompletedCheck() {
+                let puzzleCompleted = true;
                 const threshold = 2;
             
                 pieces.forEach((piece, index) => {
@@ -152,11 +154,11 @@
                     const currentTop = parseInt(piece.css('top'));
                     const correctPosition = positions[index];
                     if (Math.abs(currentLeft - correctPosition.left) > threshold || Math.abs(currentTop - correctPosition.top) > threshold) {
-                        puzzleComplete = false;
+                        puzzleCompleted = false;
                     }
                 });
             
-                if (puzzleComplete) {
+                if (puzzleCompleted) {
                     clearInterval(interval);
                     alert('Great Job! You solved the puzzle.');
                     window.location.reload();
